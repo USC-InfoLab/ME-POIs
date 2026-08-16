@@ -1,0 +1,74 @@
+{   
+    "project_name": "TrajFM_Pretraining",
+    "city": "LosAngeles",
+    "test_setting": "subsample LosAngeles", 
+    "data_path": "/data/private/maria_data/data/",
+    "file_name": "trajfm_veraset_splits/veraset/Visits/LosAngeles/whole_veraset_processed.parquet",
+    "save_dir": "./results/",
+    "use_external_labels": false,
+    "external_labels_path": "enriched_with_busyness_LosAngeles.parquet",
+
+    "save_pretrained_model": true,
+    "emb_path": "/data/private/maria_data/ME-POI_embeddings/Los_Angeles/",
+    "poi_model_name": "poi_embeds_ablation_anchors_500",
+    "text_model_name": "openai-large",
+    "anchor_path": "cache/LosAngeles/popular_times.parquet",
+
+    "use_emb_type": "poi",
+    "anchor_precomputed_weights": false,
+    
+    "gaussian_sigmas": [0.3, 1.0, 3.0],
+
+    "hyperparameter_tuning": false,
+    "pretraining_strategy": "CL",
+
+    "days_fraction": 1.0,
+
+    "num_categories": 10,
+    "num_pois": 39557,
+    
+    "LA_timezone": "America/Los_Angeles",
+    "LA_area_bbox": [32.80798, -118.944405, 34.820696, -117.652404],
+    "Houston_timezone": "America/Chicago",
+    "Houston_area_bbox": [29.549943, -95.558428, 29.951268, -95.158462],
+
+    "batch_size": 128,
+    "window_size": 32,
+    "dropout": 0.3,
+    "patience": 10,
+    "scheduler": false,
+    "mask_prob": 0.15,
+
+    "dim_embed": 512,
+    "dim_text_embed": 768,
+    "num_heads": 8,
+    "dim_feedforward": 1024,
+    "num_layers": 4,
+    
+    "downstream_task": "open_hours",
+    "d_out": 168,
+
+    "loc_encoder_type": "theory",
+
+    "f_min" : 0.1,
+    "f_max" : 1.0,
+    "n_freqs": 10,
+    "fourier_dim": 210,
+
+    "lambda_max": 1.4142,
+    "lambda_min": 0.1,
+    "num_scales": 64,
+
+    "pretrain_lr": 1e-3,
+    "fine_tune_lr": 1e-5,
+    "weight_decay": 1e-10,
+    
+    "epochs": 50,
+    "fine_tune_epochs": 100,
+
+    "random_seeds": [42, 2021, 7, 100, 0],
+    
+    "use_wandb": false,
+    "entity": "usc-infolab",
+    "device": "cuda"
+}
