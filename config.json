@@ -1,16 +1,14 @@
 {   
     "project_name": "TrajFM_Pretraining",
-    "city": "LosAngeles",
-    "test_setting": "subsample LosAngeles", 
-    "data_path": "/data/private/maria_data/data/",
+    "city": "LosAngeles", // city name, e.g., LosAngeles, Houston
+    "test_setting": "", 
+    "data_path": "./", // path to the data folder
     "file_name": "trajfm_veraset_splits/veraset/Visits/LosAngeles/whole_veraset_processed.parquet",
     "save_dir": "./results/",
-    "use_external_labels": false,
-    "external_labels_path": "enriched_with_busyness_LosAngeles.parquet",
 
     "save_pretrained_model": true,
-    "emb_path": "/data/private/maria_data/ME-POI_embeddings/Los_Angeles/",
-    "poi_model_name": "poi_embeds_ablation_anchors_500",
+    "emb_path": "embeddings/",
+    "poi_model_name": "mepois_embeds_losangeles.pt",
     "text_model_name": "openai-large",
     "anchor_path": "cache/LosAngeles/popular_times.parquet",
 
@@ -22,10 +20,8 @@
     "hyperparameter_tuning": false,
     "pretraining_strategy": "CL",
 
-    "days_fraction": 1.0,
-
-    "num_categories": 10,
-    "num_pois": 39557,
+    "num_categories": 10, // number of POI categories in the data
+    "num_pois": 39557, // number of unique POIs in the data
     
     "LA_timezone": "America/Los_Angeles",
     "LA_area_bbox": [32.80798, -118.944405, 34.820696, -117.652404],
@@ -69,6 +65,5 @@
     "random_seeds": [42, 2021, 7, 100, 0],
     
     "use_wandb": false,
-    "entity": "usc-infolab",
     "device": "cuda"
 }

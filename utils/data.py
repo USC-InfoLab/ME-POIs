@@ -424,7 +424,7 @@ def compute_anchor_precomputed_weights(
         )
 
         sigma_str = str(sigmas[idx]).replace('.', '')
-        output_path = f"{dir_path}/cache/{city}/ablation_anchors_200/transferred_distributions_sigma_{sigma_str}.parquet"
+        output_path = f"{dir_path}/cache/{city}/transferred_distributions_sigma_{sigma_str}.parquet"
         result_df.to_parquet(output_path, index=False)
         result_dict[sigmas[idx]] = result_df
     

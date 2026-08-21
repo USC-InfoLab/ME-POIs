@@ -116,25 +116,6 @@ def main():
             drop_last=True
         )
     else:
-        if args.days_fraction < 1.0:
-            # Use only a fraction of days for pretraining
-            print(f"Using {args.days_fraction*100}% of days for pretraining...")
-            print(dataset['arrival_time'].min(), dataset['arrival_time'].max())
-            
-            dataset['arrival_time'] = pd.to_datetime(dataset['arrival_time'])
-            start_date = dataset['arrival_time'].min()
-            end_date = dataset['arrival_time'].max()
-            total_duration = end_date - start_date
-            print(f"Total duration in dataset: {total_duration}")
-            
-            cutoff_date = start_date + (total_duration * args.days_fraction)
-            dataset = dataset[dataset['arrival_time'] < cutoff_date]
-            dataset = dataset.reset_index(drop=True)
-            
-            print(f"Cutoff Date for {args.days_fraction*100}%: {cutoff_date}")
-            print(f"Rows in subset: {len(dataset)}")
-            # Use the full dataset for pretraining
-            print("Using full dataset for pretraining...")
         train_loader = DataLoader(
             VisitSequencesDataset(dataset, args.window_size, args.dim_text_embed, args.emb_path + f"text_embeds_{args.text_model_name}.pt"),
             batch_size=args.batch_size,
@@ -166,6 +147,7 @@ def main():
     torch.autograd.set_detect_anomaly(True)
     
     if args.pretraining_strategy == "CL":
+        # Contrastive Learning pretraining
         pretrainer = CL_Pretrainer(
             model,
             optimizer,
@@ -183,6 +165,7 @@ def main():
         print(f"Number of trainable parameters: {pretrainer.count_params()}")
         
     elif args.pretraining_strategy == "MLM":
+        # Masked Language Modeling pretraining
         pretrainer = MLM_Pretrainer(
             model, optimizer, criterion, device,
             wandb_logger=wandb_logger,
@@ -198,9 +181,7 @@ def main():
     )
     
     if args.save_pretrained_model:
-        pretrainer.save_embeddings(args.emb_path + f"poi_embeds_ablation_anchors_200.pt",
-                                   save_text_emb=True,
-                                   loader=train_loader)
+        pretrainer.save_embeddings(args.emb_path + f"poi_embeds.pt", save_text_emb=True, loader=train_loader)
 
 if __name__ == "__main__":
     main()

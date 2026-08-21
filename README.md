@@ -1,36 +1,48 @@
-# Object-based-FM
+# Mobility Embedded POIs (ME-POIs)
 
-* Using python v3.13.2
-* To install dependencies, run `pip install -r requirementst.txt`.
+Official Implementation of `Mobility-Embedded POIs: Learning What A Place Is and How It Is Used from Human Movement`
 
-# Dev Notes
+## Setup
 
-### Data assumptions
+The code was developed with Python 3.13.2. From the repository root, install the
+dependencies:
 
-1. Staypoints that are not attributed to a POI still exist in the pre-training dataset.
-    - These staypoints still have location + time information but the category= 0, and the poi_ids = 0 (SAME to `PAD` value).
+```bash
+python -m pip install -r requirements.txt
+```
 
-2. Attributed staypoints (= Visits) have the following attributes. 
-    - Location
-    - Time of arrival
-    - Time of departure
-    - Category => following Safegraph's top category attribute
-    - Naics codes => from safefraph
-    - Naics 2 digit codes => the first 2 digits indicate higher level category.
+Before running either script, update `config.json` with paths for your data and
+embeddings. In particular, check `data_path`, `file_name`, `emb_path`,
+`anchor_path`, `city`, and `save_dir`. The configured paths may need to be
+changed from the example paths in this repository.
 
-3. Some POIs might still not have category information. In this case the category is again `UNKNOWN`.
+## Pretraining
 
-4. All `UNKNOWN` and `PADDED` VALUES are set to 0. Please see `utils/constants.py` file.
+Pretraining loads the visit dataset, text embeddings, and anchor data specified
+in `config.json`. Run it from the repository root:
 
+```bash
+python run_pretrain.py
+```
 
-### Pretraining
+Set `pretraining_strategy` to `CL` or `MLM` in `config.json`. When
+`save_pretrained_model` is `true`, the resulting POI embeddings are written to
+`emb_path/poi_embeds.pt`.
 
-1. Pre training utilizes the whole dataset. We can potentially keep some users out to evaluate the models MLM pre-training. 
+## Evaluation
 
+Evaluation fine-tunes and evaluates POI embeddings for the downstream task in
+`config.json`. Run it after pretraining (or after providing a compatible
+`emb_path/poi_embeds.pt`):
 
-LA bbox: [32.80798, -118.944405, 34.820696, -117.652404]
-LA num pois: 39557
-window size: 32
+```bash
+python run_eval.py
+```
 
-Houston bbox: 29.557009000000004, -95.558418, 29.949892, -95.158592
-Houston num pois: 32160 / 28419
+The supported values for `downstream_task` are `open_hours`, and
+`is_closed`. All three tasks use labels from the processed SafeGraph
+dataset.
+
+Evaluation also loads the text embedding files for the model names defined in
+`run_eval.py` (`e5`, `gtr-t5`, `gemini`, `nomic`, `mpnet`, `openai-large`, and
+`openai-small`) from `emb_path`.

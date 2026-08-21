@@ -39,10 +39,8 @@ def main():
     args = args_parser("config.json")
     
     model_names = ['e5', 'gtr-t5', 'gemini', 'nomic', 'mpnet', 'openai-large', 'openai-small']
-    baseline_names = ['ctle', 'hier', 'deepmove', 'getnext', 'graphflashback', 'poi2vec', 
-                      'skipgram', 'stan', 'tale', 'teaser', 'trajgpt', 'poi_embeds_openai-large']
     
-    for name in baseline_names:
+    for name in model_names:
         all_results = {
             "precision": [],
             "recall": [],
@@ -96,20 +94,14 @@ def main():
                 args.area_bbox = args.Houston_area_bbox
                 args.timezone = args.Houston_timezone
             
-            # Check if external labels exist in args
-            # If they do, then the evaluation will be on external data
-            if args.use_external_labels:    
-                df_data = pd.read_parquet(args.external_labels_path)
-                print(f"Loaded external labels with shape: {df_data.shape}")
-            else:
-            # Else, load labels from Veraset x Safegraph dataset        
-                df_data = load_dataset(
-                    path=args.data_path, 
-                    file_name=args.file_name,
-                    loc_encoder_type=args.loc_encoder_type,
-                    area_bbox=args.area_bbox,
-                    area_timezone=args.timezone,
-                )
+            # Load labels from the processed Veraset x SafeGraph dataset.
+            df_data = load_dataset(
+                path=args.data_path,
+                file_name=args.file_name,
+                loc_encoder_type=args.loc_encoder_type,
+                area_bbox=args.area_bbox,
+                area_timezone=args.timezone,
+            )
 
             # Split the dataset into train, validation, and test sets
             df_train, df_other = eval_dataset_split(
@@ -135,10 +127,6 @@ def main():
                 y_train = np.stack(df_train['open_hours'].to_numpy())
                 y_val = np.stack(df_val['open_hours'].to_numpy())
                 y_test = np.stack(df_test['open_hours'].to_numpy())
-            elif args.downstream_task == "busyness":
-                y_train = np.stack(df_train['busyness'].to_numpy())
-                y_val = np.stack(df_val['busyness'].to_numpy())
-                y_test = np.stack(df_test['busyness'].to_numpy())
             elif args.downstream_task == "is_closed":
                 y_train = df_train['is_closed'].to_numpy().astype(np.float32)
                 y_val = df_val['is_closed'].to_numpy().astype(np.float32)
@@ -148,8 +136,8 @@ def main():
             print(f"Label shapes: train {y_train.shape}, val {y_val.shape}, test {y_test.shape}")
         
             # Load embedding from pickle file
-            poi_embeddings = torch.load(args.emb_path + f"/baselines/{name}.pt")
-            text_embeddings = torch.load(args.emb_path + f"text_embeds_openai-large.pt")
+            poi_embeddings = torch.load(args.emb_path + f"poi_embeds.pt")
+            text_embeddings = torch.load(args.emb_path + f"text_embeds_{name}.pt")
             
             # Filter out POIs without embeddings
             X_train, y_train = filter_by_available_embeddings(X_train, y_train, text_embeddings)
